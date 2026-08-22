@@ -42,17 +42,23 @@ exports.handler = async event => {
 
 Use SOMENTE os dados estruturados recebidos. Não invente valores, pessoas, causas ou metas ausentes.
 
-Respeite a origem dos dados:
-- Vendas vem da base Vendas.
-- Upgrade vem da base Upgrade.
+Respeite obrigatoriamente a origem dos dados:
+- Vendas vem exclusivamente da base Vendas.
+- Upgrade vem exclusivamente da base Upgrade.
 - Metas, projeções, distribuições e problemas sistêmicos vêm do extrato do painel.
 
-"Concorrente" significa EPS Pessoalize.
+"Concorrente" significa exclusivamente os registros cuja coluna EPS contém Pessoalize.
 
 Para comparar filiais de Vendas, compare:
 - EPS Pessoalize;
 - Segmento Vendas CWB;
 - Segmento Vendas SP.
+
+A análise da Pessoalize deve considerar Vendas e Upgrade separadamente e somente registros com:
+- Rep Vendas preenchido na base Vendas;
+- Login preenchido na base Upgrade.
+
+Não use País, Segmento, EPS ou outro campo como nome de pessoa.
 
 A competência vigente é o padrão. Só use competência anterior quando ela estiver explícita na pergunta e aparecer em competenciaAplicada.
 
@@ -60,14 +66,35 @@ Os totais representam registros encontrados nas bases operacionais.
 
 Sempre chame NR Smiles de "número de membro" nas respostas ao usuário.
 
-Rankings de agentes devem contar os registros agrupados pela coluna Agente. Nunca identifique ou infira o agente por outra coluna.
+Rankings de agentes devem contar exclusivamente nomes preenchidos na coluna Agente.
 
-Faça uma análise objetiva e fácil de ler, focada em:
-- concentração dos resultados;
+Nunca inclua no ranking:
+- BRASIL;
+- ARGENTINA;
+- Não informado;
+- País;
+- EPS;
+- Segmento.
+
+Quando a consulta for específica da Pessoalize, use Rep Vendas ou Login como responsável, pois a coluna Agente pode estar vazia nessa EPS.
+
+Quando a pergunta mencionar PAs da Pessoalize, use:
+- quantidades distintas de Rep Vendas em Vendas;
+- quantidades distintas de Login em Upgrade.
+
+Quando a pergunta usar "ontem", respeite a data exata calculada pelo JavaScript como hoje menos um dia.
+
+Para Upgrade, a data de referência é sempre a coluna A, dt_solicitacao.
+
+Quando houver exclusão de plano, como "não foi 1.000", respeite o filtro e não recoloque o plano excluído na análise.
+
+Faça uma análise objetiva, fácil de ler e focada em:
+- concentração;
 - diferenças relevantes;
 - evolução por data;
-- representatividade;
-- pontos de atenção sustentados pelos números.
+- pontos de atenção sustentados pelos números;
+- oportunidades;
+- recomendações práticas.
 
 Use problemasSistemicos para enriquecer o resumo quando houver conteúdo, sem presumir impacto ou causalidade não demonstrada.
 
@@ -128,8 +155,7 @@ ${JSON.stringify(context)}`;
       });
     }
 
-    const parts =
-      result?.candidates?.[0]?.content?.parts || [];
+    const parts = result?.candidates?.[0]?.content?.parts || [];
 
     const answer = parts
       .filter(part => part.thought !== true)
