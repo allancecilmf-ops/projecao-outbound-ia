@@ -1,11 +1,13 @@
-const SHEET_ID = "1nNwXnq-Fkyr_9kyNjNASZ7vL98-IKioKWcYbN11eK7s";
+const SHEET_ID =
+  "1nNwXnq-Fkyr_9kyNjNASZ7vL98-IKioKWcYbN11eK7s";
+
 const DASHBOARD_GID = "1641897951";
 
 exports.handler = async () => {
   try {
     const url =
-      `https://docs.google.com/spreadsheets/d/${SHEET_ID}/` +
-      `export?format=csv&gid=${DASHBOARD_GID}`;
+      `https://docs.google.com/spreadsheets/d/${SHEET_ID}` +
+      `/export?format=csv&gid=${DASHBOARD_GID}`;
 
     const response = await fetch(url, {
       redirect: "follow"
@@ -32,7 +34,8 @@ exports.handler = async () => {
       statusCode: 200,
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
-        "Cache-Control": "no-store, no-cache, must-revalidate",
+        "Cache-Control":
+          "no-store, no-cache, must-revalidate",
         "Access-Control-Allow-Origin": "*"
       },
       body: csv
@@ -44,7 +47,8 @@ exports.handler = async () => {
         "Content-Type": "application/json; charset=utf-8"
       },
       body: JSON.stringify({
-        error: "Não foi possível carregar a aba do painel",
+        error:
+          "Não foi possível carregar a aba do painel",
         detail: error.message
       })
     };
