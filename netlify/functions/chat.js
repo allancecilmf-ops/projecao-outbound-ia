@@ -23,7 +23,10 @@ exports.handler = async event => {
 
   try {
     const body = JSON.parse(event.body || "{}");
-    const question = String(body.question || "").trim().slice(0, 1500);
+    const question = String(body.question || "")
+      .trim()
+      .slice(0, 1500);
+
     const context = body.context;
 
     if (!question) {
@@ -42,74 +45,59 @@ exports.handler = async event => {
 
 Use SOMENTE os dados estruturados recebidos. Não invente valores, pessoas, causas ou metas ausentes.
 
-Respeite obrigatoriamente a origem dos dados:
-- Vendas vem exclusivamente da base Vendas.
-- Upgrade vem exclusivamente da base Upgrade.
-- Metas, projeções, distribuições e problemas sistêmicos vêm do extrato do painel.
+Respeite a origem dos dados:
+- Vendas vem da base Vendas;
+- Upgrade vem da base Upgrade;
+- metas, projeções, distribuições e problemas sistêmicos vêm do extrato do painel.
 
-"Concorrente" significa exclusivamente os registros cuja coluna EPS contém Pessoalize.
+"Concorrente" significa exclusivamente os registros cuja coluna EPS contém Pessoalize. Para comparar filiais de Vendas, compare EPS Pessoalize, segmento Vendas CWB e segmento Vendas SP.
 
-Para comparar filiais de Vendas, compare:
-- EPS Pessoalize;
-- Segmento Vendas CWB;
-- Segmento Vendas SP.
+A análise da Pessoalize deve considerar Vendas e Upgrade separadamente e somente registros com Rep Vendas (base Vendas) ou Login (base Upgrade) preenchido. Não use País, Segmento ou outro campo como nome de pessoa.
 
-A análise da Pessoalize deve considerar Vendas e Upgrade separadamente e somente registros com:
-- Rep Vendas preenchido na base Vendas;
-- Login preenchido na base Upgrade.
+A Pessoalize e a coluna EPS só podem ser utilizadas quando a pergunta mencionar explicitamente "Pessoalize" ou "concorrente".
 
-Não use País, Segmento, EPS ou outro campo como nome de pessoa.
+Nos comandos "Resumo conclusivo da competência vigente" e "Pontos de atenção e plano de ação", é proibido mencionar Pessoalize, concorrente ou resultados por EPS, mesmo que esses dados existam em outro contexto.
+
+No "Resumo conclusivo da competência vigente", organize a análise sempre pelos resultados da coluna Segmento e pelos indicadores do extrato. Apresente os resultados dos segmentos disponíveis, sem criar agrupamentos por EPS.
+
+Em "Pontos de atenção e plano de ação", use somente Segmento, operação, meta, realizado, projeção, atingimento, GAP, produtividade e problemas sistêmicos. Não utilize EPS como dimensão, filtro, comparação ou justificativa.
 
 A competência vigente é o padrão. Só use competência anterior quando ela estiver explícita na pergunta e aparecer em competenciaAplicada.
 
-Os totais representam registros encontrados nas bases operacionais.
+Os totais representam registros encontrados nas bases operacionais. Sempre chame NR Smiles de "número de membro" nas respostas ao usuário.
 
-Sempre chame NR Smiles de "número de membro" nas respostas ao usuário.
+Rankings de agentes devem contar exclusivamente nomes preenchidos na coluna Agente. Nunca inclua BRASIL, ARGENTINA, Não informado, País, EPS ou Segmento no ranking.
 
-Rankings de agentes devem contar exclusivamente nomes preenchidos na coluna Agente.
+Quando a consulta for específica da Pessoalize, use Rep Vendas/Login como responsável, pois a coluna Agente pode estar vazia nessa EPS.
 
-Nunca inclua no ranking:
-- BRASIL;
-- ARGENTINA;
-- Não informado;
-- País;
-- EPS;
-- Segmento.
-
-Quando a consulta for específica da Pessoalize, use Rep Vendas ou Login como responsável, pois a coluna Agente pode estar vazia nessa EPS.
-
-Quando a pergunta mencionar PAs da Pessoalize, use:
-- quantidades distintas de Rep Vendas em Vendas;
-- quantidades distintas de Login em Upgrade.
+Quando a pergunta mencionar PAs da Pessoalize, use as quantidades distintas de Rep Vendas em Vendas e de Login em Upgrade já calculadas pelo JavaScript.
 
 Quando a pergunta usar "ontem", respeite a data exata calculada pelo JavaScript como hoje menos um dia.
 
-Para Upgrade, a data de referência é sempre a coluna A, dt_solicitacao.
+Para Upgrade, a data de referência é sempre a coluna A (dt_solicitacao).
 
 Quando houver exclusão de plano, como "não foi 1.000", respeite o filtro e não recoloque o plano excluído na análise.
 
-Faça uma análise objetiva, fácil de ler e focada em:
-- concentração;
-- diferenças relevantes;
-- evolução por data;
-- pontos de atenção sustentados pelos números;
-- oportunidades;
-- recomendações práticas.
+Faça uma análise objetiva, fácil de ler e focada em concentração, diferenças relevantes, evolução por data e pontos de atenção sustentados pelos números.
+
+Quando a pergunta pedir resultados dia a dia, apresente cada data em ordem cronológica acompanhada de sua quantidade de vendas, upgrades ou registros do segmento solicitado.
 
 Use problemasSistemicos para enriquecer o resumo quando houver conteúdo, sem presumir impacto ou causalidade não demonstrada.
 
-Quando os dados não forem suficientes para responder com segurança, peça ao usuário que reformule informando:
-- operação;
-- filial ou EPS;
-- período;
-- agrupamento desejado.
+Cada problema sistêmico está associado à operação da mesma linha do Extrato. Respeite obrigatoriamente essa associação e a competência aplicada: nunca atribua o problema de uma operação a outro segmento.
+
+Quando a pergunta indicar uma operação ou segmento, apresente somente os problemas correspondentes a essa operação.
+
+Quando os dados não forem suficientes para entender ou responder com segurança, peça ao usuário que reformule informando operação, filial/EPS, período e agrupamento.
 
 Apresente no máximo 8 tópicos e finalize com uma conclusão curta.
 
 PERGUNTA:
+
 ${question}
 
 DADOS CALCULADOS PELO JAVASCRIPT:
+
 ${JSON.stringify(context)}`;
 
     const endpoint =
@@ -155,7 +143,8 @@ ${JSON.stringify(context)}`;
       });
     }
 
-    const parts = result?.candidates?.[0]?.content?.parts || [];
+    const parts =
+      result?.candidates?.[0]?.content?.parts || [];
 
     const answer = parts
       .filter(part => part.thought !== true)
